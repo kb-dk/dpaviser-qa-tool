@@ -36,9 +36,31 @@
     <dependencies>
         <dependency>
             <groupId>dk.statsbiblioteket.newspaper</groupId>
+            <artifactId>tree-processor-runnable-component</artifactId>
+            <version>2.11-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>dk.statsbiblioteket.newspaper</groupId>
+            <artifactId>newspaper-autonomous-component</artifactId>
+            <version>2.11-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>dk.statsbiblioteket.newspaper</groupId>
             <artifactId>dpaviser-structure-checker-component</artifactId>
             <version>master-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jcl-over-slf4j</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+
+
     </dependencies>
 
     <build>

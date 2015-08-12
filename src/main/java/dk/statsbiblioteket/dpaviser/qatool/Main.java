@@ -1,7 +1,6 @@
 package dk.statsbiblioteket.dpaviser.qatool;
 
 import dk.statsbiblioteket.medieplatform.autonomous.Batch;
-import dk.statsbiblioteket.medieplatform.autonomous.ConfigConstants;
 import dk.statsbiblioteket.medieplatform.autonomous.ResultCollector;
 import dk.statsbiblioteket.medieplatform.autonomous.RunnableComponent;
 import dk.statsbiblioteket.util.Strings;
@@ -11,11 +10,14 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Properties;
-import java.util.Set;
+import java.util.concurrent.Executors;
 import java.util.regex.Pattern;
+
+import static dk.statsbiblioteket.medieplatform.autonomous.ConfigConstants.AT_NINESTARS;
+import static dk.statsbiblioteket.medieplatform.autonomous.ConfigConstants.AUTONOMOUS_BATCH_STRUCTURE_STORAGE_DIR;
+import static dk.statsbiblioteket.medieplatform.autonomous.ConfigConstants.ITERATOR_FILESYSTEM_BATCHES_FOLDER;
+import static dk.statsbiblioteket.medieplatform.autonomous.ConfigConstants.THREADS_PER_BATCH;
 
 public class Main {
     private Logger log = LoggerFactory.getLogger(getClass());
@@ -29,68 +31,29 @@ public class Main {
         }
     }
 
-    protected  int doMain(String... args) {
-        if (args.length < 2) {
-            System.err.println("Too few parameters");
-            usage();
-            return 2;
-        }
-        log.info("Entered " + getClass());
-        Properties properties;
-        Batch batch;
-        try {
-            //Get the batch (id) from the command line
-            batch = getBatch(args[0]);
-            //Create the properties that need to be passed into the components
-            properties = createProperties(args[0], args[1]);
-        } catch (Exception e) {
-            usage();
-            System.err.println(e.getMessage());
-            return 2;
-        }
-
-        //This is the list of results so far
-        ArrayList<ResultCollector> resultList = new ArrayList<>();
-        try {
-            //Make the components
-            RunnableComponent batchStructureCheckerComponent = new dk.statsbiblioteket.dpaviser.BatchStructureCheckerComponent(properties);
-            //Run the batch structure checker component, where the result is added to the resultlist
-            runComponent(batch, resultList, batchStructureCheckerComponent);
-            //Add more components as needed
-        } catch (WorkException e) {
-            // Ignore, already handled
-        }
-        ResultCollector mergedResult = NinestarsUtils.mergeResults(resultList);
-        String result = NinestarsUtils.convertResult(mergedResult,batch.getFullID());
-        System.out.println(result);
-        if (!mergedResult.isSuccess()) {
-            return 1;
-        } else {
-            return 0;
-        }
-    }
-
-
     /**
      * Create a properties construct with just one property, "scratch". Scratch denotes the folder where the batches
      * reside. It is takes as the parent of the first argument, which should be the path to the batch
      *
      * @param batchPath the path to the batch
-     * @param sqlString the Sql connect string
-     *
      * @return a properties construct
      * @throws RuntimeException on trouble parsing arguments.
      */
-    private static Properties createProperties(String batchPath,String sqlString) throws IOException {
+    private static Properties createProperties(String batchPath) throws IOException {
         Properties properties = new Properties(System.getProperties());
         File batchFile = new File(batchPath);
-        setIfNotSet(properties, ConfigConstants.ITERATOR_FILESYSTEM_BATCHES_FOLDER, batchFile.getParent());
-        setIfNotSet(properties, ConfigConstants.AT_NINESTARS, Boolean.TRUE.toString());
-        setIfNotSet(properties, ConfigConstants.MFPAK_URL, sqlString);
-        setIfNotSet(properties,
-                ConfigConstants.AUTONOMOUS_BATCH_STRUCTURE_STORAGE_DIR,
-                createTempDir().getAbsolutePath());
-        setIfNotSet(properties, ConfigConstants.THREADS_PER_BATCH, Runtime.getRuntime().availableProcessors() + "");
+        setIfNotSet(properties, ITERATOR_FILESYSTEM_BATCHES_FOLDER, batchFile.getParent());
+        setIfNotSet(properties, AT_NINESTARS, Boolean.TRUE.toString());
+        setIfNotSet(properties, AUTONOMOUS_BATCH_STRUCTURE_STORAGE_DIR, createTempDir().getAbsolutePath());
+        setIfNotSet(properties, THREADS_PER_BATCH, Runtime.getRuntime().availableProcessors() + "");
+// FIXME:  ENCODE INTO PROPERTIES:
+//        TransformingIteratorForFileSystems iterator = new TransformingIteratorForFileSystems(new File(arg),
+//                "\\.",
+//                ".*\\.pdf$",
+//                ".md5",
+//                null);
+//        MultiThreadedEventRunner eventRunner = new MultiThreadedEventRunner(iterator, eventHandlers, resultCollector, getForker(), Executors.newFixedThreadPool(threads));
+//        eventRunner.run();
 
         return properties;
     }
@@ -124,19 +87,15 @@ public class Main {
      * Parse the batch and round trip id from the first argument to the script
      *
      * @param arg0 the first command line argument
-     *
      * @return the batch id as a batch with no events
      */
     protected static Batch getBatch(String arg0) {
         File batchPath = new File(arg0);
+        System.out.println("Looking at: " + batchPath.getAbsolutePath());
         if (!batchPath.isDirectory()) {
             throw new RuntimeException("Must have first argument as existing directory");
         }
-        String batchFullId = batchPath.getName();
-        String[] splits = batchFullId.split(Pattern.quote("-RT"));
-        Batch batch = new Batch(splits[0].replaceAll("[^0-9]", "").trim());
-        batch.setRoundTripNumber(Integer.parseInt(splits[1].trim()));
-        return batch;
+        return new InfomediaBatch(batchPath.getName());
     }
 
     /**
@@ -146,7 +105,6 @@ public class Main {
      * @param batch           the batch to work on
      * @param component       the component doing the work
      * @param resultCollector the result collector
-     *
      * @return the resultcollector
      * @throws WorkException if the component threw an exception
      */
@@ -173,6 +131,47 @@ public class Main {
         System.err.print(
                 "Usage: \n" + "java " + Main.class.getName() + " <batchdirectory>");
         System.err.println();
+    }
+
+    protected int doMain(String... args) {
+        if (args.length < 1) {
+            System.err.println("Too few parameters");
+            usage();
+            return 2;
+        }
+        log.info("Entered " + getClass());
+        Properties properties;
+        Batch batch;
+        try {
+            //Get the batch (id) from the command line
+            batch = getBatch(args[0]);
+            //Create the properties that need to be passed into the components
+            properties = createProperties(args[0]);
+        } catch (Exception e) {
+            usage();
+            e.printStackTrace(System.err);
+            return 2;
+        }
+
+        //This is the list of results so far
+        ArrayList<ResultCollector> resultList = new ArrayList<>();
+        try {
+            //Make the components
+            RunnableComponent batchStructureCheckerComponent = new dk.statsbiblioteket.dpaviser.BatchStructureCheckerComponent(properties);
+            //Run the batch structure checker component, where the result is added to the resultlist
+            runComponent(batch, resultList, batchStructureCheckerComponent);
+            //Add more components as needed
+        } catch (WorkException e) {
+            // Ignore, already handled
+        }
+        ResultCollector mergedResult = NinestarsUtils.mergeResults(resultList);
+        String result = mergedResult.toReport();
+        System.out.println(result);
+        if (!mergedResult.isSuccess()) {
+            return 1;
+        } else {
+            return 0;
+        }
     }
 }
 
