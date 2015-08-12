@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>dk.statsbiblioteket.newspaper</groupId>
+        <artifactId>newspaper-parent</artifactId>
+        <version>1.4-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>dpaviser-qa-tool</artifactId>
+    <version>master-SNAPSHOT</version>
+
+    <scm>
+        <url>https://github.com/statsbiblioteket/dpaviser-qa-tool</url>
+        <connection>scm:git:https://github.com/statsbiblioteket/dpaviser-structure-checker.git</connection>
+        <developerConnection>scm:git:git@github.com:statsbiblioteket/dpaviser-qa-tool.git</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
+
+    <repositories>
+        <repository>
+            <id>sbforge-nexus</id>
+            <url>https://sbforge.org/nexus/content/groups/public</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
+
+    <dependencies>
+        <dependency>
+            <groupId>dk.statsbiblioteket.newspaper</groupId>
+            <artifactId>dpaviser-structure-checker-component</artifactId>
+            <version>master-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
+</project>
+
