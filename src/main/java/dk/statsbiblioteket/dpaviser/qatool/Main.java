@@ -2,6 +2,7 @@ package dk.statsbiblioteket.dpaviser.qatool;
 
 import dk.statsbiblioteket.dpaviser.BatchStructureCheckerComponent;
 import dk.statsbiblioteket.medieplatform.autonomous.Batch;
+import dk.statsbiblioteket.medieplatform.autonomous.ConfigConstants;
 import dk.statsbiblioteket.medieplatform.autonomous.ResultCollector;
 import dk.statsbiblioteket.medieplatform.autonomous.RunnableComponent;
 import dk.statsbiblioteket.util.Strings;
@@ -45,6 +46,12 @@ public class Main {
         setIfNotSet(properties, AT_NINESTARS, Boolean.TRUE.toString());
         setIfNotSet(properties, AUTONOMOUS_BATCH_STRUCTURE_STORAGE_DIR, createTempDir().getAbsolutePath());
         setIfNotSet(properties, THREADS_PER_BATCH, Runtime.getRuntime().availableProcessors() + "");
+
+        setIfNotSet(properties, ConfigConstants.ITERATOR_FILESYSTEM_GROUPINGCHAR, ".");
+        setIfNotSet(properties, ConfigConstants.ITERATOR_DATAFILEPATTERN, ".*\\.pdf$");
+        setIfNotSet(properties, ConfigConstants.ITERATOR_FILESYSTEM_CHECKSUMPOSTFIX, ".md5");
+        setIfNotSet(properties, ConfigConstants.ITERATOR_FILESYSTEM_IGNOREDFILES, "");
+
 // FIXME:  ENCODE INTO PROPERTIES:
 //        TransformingIteratorForFileSystems iterator = new TransformingIteratorForFileSystems(new File(arg),
 //                "\\.",
@@ -85,16 +92,16 @@ public class Main {
     /**
      * Parse the batch and round trip id from the first argument to the script
      *
-     * @param arg0 the first command line argument
+     * @param batchDirPath the first command line argument
      * @return the batch id as a batch with no events
      */
-    protected static Batch getBatch(String arg0) {
-        File batchPath = new File(arg0);
-        System.out.println("Looking at: " + batchPath.getAbsolutePath());
-        if (!batchPath.isDirectory()) {
+    protected static Batch getBatch(String batchDirPath) {
+        File batchDirFile = new File(batchDirPath);
+        System.out.println("Looking at: " + batchDirFile.getAbsolutePath());
+        if (!batchDirFile.isDirectory()) {
             throw new RuntimeException("Must have first argument as existing directory");
         }
-        return new InfomediaBatch(batchPath.getName());
+        return new InfomediaBatch(batchDirFile.getName());
     }
 
     /**
