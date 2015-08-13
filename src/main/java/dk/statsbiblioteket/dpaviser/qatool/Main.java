@@ -1,5 +1,6 @@
 package dk.statsbiblioteket.dpaviser.qatool;
 
+import dk.statsbiblioteket.dpaviser.BatchStructureCheckerComponent;
 import dk.statsbiblioteket.medieplatform.autonomous.Batch;
 import dk.statsbiblioteket.medieplatform.autonomous.ResultCollector;
 import dk.statsbiblioteket.medieplatform.autonomous.RunnableComponent;
@@ -11,8 +12,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Properties;
-import java.util.concurrent.Executors;
-import java.util.regex.Pattern;
 
 import static dk.statsbiblioteket.medieplatform.autonomous.ConfigConstants.AT_NINESTARS;
 import static dk.statsbiblioteket.medieplatform.autonomous.ConfigConstants.AUTONOMOUS_BATCH_STRUCTURE_STORAGE_DIR;
@@ -153,21 +152,25 @@ public class Main {
             return 2;
         }
 
-        //This is the list of results so far
         ArrayList<ResultCollector> resultList = new ArrayList<>();
         try {
-            //Make the components
-            RunnableComponent batchStructureCheckerComponent = new dk.statsbiblioteket.dpaviser.BatchStructureCheckerComponent(properties);
-            //Run the batch structure checker component, where the result is added to the resultlist
+            RunnableComponent batchStructureCheckerComponent = new BatchStructureCheckerComponent(properties);
             runComponent(batch, resultList, batchStructureCheckerComponent);
             //Add more components as needed
         } catch (WorkException e) {
             // Ignore, already handled
         }
-        ResultCollector mergedResult = NinestarsUtils.mergeResults(resultList);
-        String result = mergedResult.toReport();
+
+        //
+
+        ResultCollector finalresult = new ResultCollector("batch", getClass().getPackage().getImplementationVersion());
+        for (ResultCollector resultCollector : resultList) {
+            finalresult = resultCollector.mergeInto(finalresult);
+        }
+        String result = finalresult.toReport();
         System.out.println(result);
-        if (!mergedResult.isSuccess()) {
+
+        if (!finalresult.isSuccess()) {
             return 1;
         } else {
             return 0;
