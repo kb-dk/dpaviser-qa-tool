@@ -186,7 +186,8 @@ License agreement version of: 30 January 2006
 	spellings.
 	
 -->
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+<xs:schema xmlns="http://iptc.org/std/NewsML/2003-10-10/" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           targetNamespace="http://iptc.org/std/NewsML/2003-10-10/" elementFormDefault="qualified">
     <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="xml.xsd"/>
     <xs:annotation>
         <xs:documentation>IPTC NewsML 1.2 XML Schema, version 4</xs:documentation>
@@ -308,9 +309,6 @@ License agreement version of: 30 January 2006
                                         <xs:attributeGroup ref="formalname"/>
                                     </xs:complexType>
                                 </xs:element>
-                                <xs:element name="ArticleDate" type="xs:string" minOccurs="0"/>
-                                <xs:element name="ArticleWeekDay" type="xs:string" minOccurs="0"/>
-                                <xs:element name="ArticleMonth" type="xs:string" minOccurs="0"/>
                             </xs:sequence>
                             <xs:attributeGroup ref="localid"/>
                         </xs:complexType>
@@ -541,10 +539,8 @@ License agreement version of: 30 January 2006
             </xs:documentation>
         </xs:annotation>
         <xs:restriction base="xs:string">
-            <!--
-                <xs:pattern value="(19[0-9][0-9]|20[0-9][0-9]|21[0-9][0-9])(0[1-9]|1[0-2])(0[1-9]|[1-2][0-9]|3[0-1])(T(([0-1][0-9]|2[0-3])([0-5][0-9][0-5][0-9])|240000)(Z|[+\-](0[0-9]|1[0-1])([0-5][0-9]|1200))?)?"/>
-             -->
-            <xs:pattern value=".*"/>
+            <xs:pattern
+                    value="(19[0-9][0-9]|20[0-9][0-9]|21[0-9][0-9])(0[1-9]|1[0-2])(0[1-9]|[1-2][0-9]|3[0-1])(T(([0-1][0-9]|2[0-3])([0-5][0-9][0-5][0-9])|240000)(Z|[+\-](0[0-9]|1[0-1])([0-5][0-9]|1200))?)?"/>
         </xs:restriction>
     </xs:simpleType>
     <xs:simpleType name="NewsMLDate">
@@ -757,27 +753,9 @@ License agreement version of: 30 January 2006
             </xs:documentation>
         </xs:annotation>
         <xs:sequence>
-            <xs:element name="Categories" minOccurs="0" maxOccurs="unbounded">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element name="Term" minOccurs="0" maxOccurs="unbounded">
-                            <xs:complexType mixed="true">
-                                <xs:attribute name="class" type="xs:string"/>
-                                <xs:attribute name="score" type="xs:string"/>
-                                <xs:attribute name="origin" type="xs:string"/>
-                                <xs:attribute name="timestamp" type="xs:string"/>
-                            </xs:complexType>
-                        </xs:element>
-                    </xs:sequence>
-                    <xs:attribute name="FormalName" type="xs:string"/>
-                </xs:complexType>
-
-            </xs:element>
             <xs:element name="Comment" type="CommentType" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="Catalog" type="CatalogType" minOccurs="0"/>
-            <!--
             <xs:element name="TopicSet" type="TopicSetType" minOccurs="0" maxOccurs="unbounded"/>
-            -->
             <xs:element name="Role" minOccurs="0">
                 <xs:annotation>
                     <xs:documentation>An identifier of the role played by a NewsComponent within a NewsComponent that
@@ -892,7 +870,6 @@ License agreement version of: 30 January 2006
                                 <xs:attribute ref="xml:lang" use="optional"/>
                             </xs:complexType>
                         </xs:element>
-                        <xs:element name="SourceCode" minOccurs="0" type="xs:string"/>
                         <xs:element name="CreditLine">
                             <xs:annotation>
                                 <xs:documentation>A natural-language statement of credit information.</xs:documentation>
@@ -1115,56 +1092,10 @@ License agreement version of: 30 January 2006
                             </xs:complexType>
                         </xs:element>
                         <xs:element name="Property" type="PropertyType" minOccurs="0" maxOccurs="unbounded"/>
-
-                        <xs:element name="Authors" minOccurs="0">
-                            <xs:complexType>
-                                <xs:sequence>
-                                    <xs:element name="Author" minOccurs="0" maxOccurs="unbounded" type="xs:string">
-                                    </xs:element>
-                                </xs:sequence>
-                                <xs:attribute name="FormalName" type="xs:string"/>
-                            </xs:complexType>
-                        </xs:element>
-
-                        <xs:element name="Sourcegroups" minOccurs="0">
-                            <xs:complexType>
-                                <xs:sequence>
-                                    <xs:element name="Group" minOccurs="0" maxOccurs="unbounded" type="xs:string">
-                                    </xs:element>
-                                </xs:sequence>
-                            </xs:complexType>
-
-                        </xs:element>
-
-
                     </xs:sequence>
                     <xs:attributeGroup ref="localid"/>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="TopicSet" minOccurs="0">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element name="Topic" minOccurs="0" maxOccurs="unbounded">
-                            <xs:complexType>
-                                <xs:sequence>
-                                    <xs:element name="TopicType" minOccurs="0">
-                                        <xs:complexType>
-                                            <xs:attribute name="FormalName" type="xs:string"/>
-                                        </xs:complexType>
-                                    </xs:element>
-                                    <xs:element name="Description" minOccurs="0" type="xs:string">
-                                    </xs:element>
-                                </xs:sequence>
-                                <xs:attribute name="Duid" type="xs:string"/>
-                                <xs:attribute name="Details" type="xs:string"/>
-                            </xs:complexType>
-                        </xs:element>
-                    </xs:sequence>
-                    <xs:attribute name="FormalName" type="xs:string"/>
-                </xs:complexType>
-
-            </xs:element>
-
             <xs:element name="RightsMetadata" minOccurs="0">
                 <xs:annotation>
                     <xs:documentation>Information about the rights pertaining to a NewsComponent.</xs:documentation>
@@ -1649,13 +1580,12 @@ License agreement version of: 30 January 2006
                                             </xs:annotation>
                                             <xs:complexType>
                                                 <xs:simpleContent>
-                                                    <xs:extension base="xs:nonNegativeInteger">
+                                                    <xs:extension base="xs:positiveInteger">
                                                         <xs:attributeGroup ref="localid"/>
                                                     </xs:extension>
                                                 </xs:simpleContent>
                                             </xs:complexType>
                                         </xs:element>
-                                        <xs:element name="WordCount" minOccurs="0" type="xs:int" />
                                         <xs:element name="Property" type="PropertyType" minOccurs="0"
                                                     maxOccurs="unbounded"/>
                                     </xs:sequence>
@@ -1700,14 +1630,6 @@ License agreement version of: 30 January 2006
         <xs:sequence>
             <xs:element name="Comment" type="CommentType" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="Catalog" type="CatalogType" minOccurs="0"/>
-            <xs:element name="AdministrativeProperties" minOccurs="0">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element name="Property" type="PropertyType" minOccurs="0"
-                                    maxOccurs="unbounded"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
             <xs:element name="Identification">
                 <xs:annotation>
                     <xs:documentation>Identification information for the NewsItem.</xs:documentation>
@@ -1840,10 +1762,8 @@ License agreement version of: 30 January 2006
                                         <xs:simpleType>
                                             <xs:restriction base="xs:string">
                                                 <xs:minLength value="27"/>
-                                                <!--
-                                                <xs:pattern value="urn:newsml:\D+:(19[0-9][0-9]|20[0-9][0-9]|21[0-9][0-9])(0[1-9]|1[0-2])(0[1-9]|[1-2][0-9]|3[0-1]):.+:\d+\D?"/>
-                                                 -->
-                                                <xs:pattern value=".*"/>
+                                                <xs:pattern
+                                                        value="urn:newsml:\D+:(19[0-9][0-9]|20[0-9][0-9]|21[0-9][0-9])(0[1-9]|1[0-2])(0[1-9]|[1-2][0-9]|3[0-1]):.+:\d+\D?"/>
                                             </xs:restriction>
                                         </xs:simpleType>
                                     </xs:element>
