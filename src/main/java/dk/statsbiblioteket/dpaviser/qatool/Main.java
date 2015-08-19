@@ -11,7 +11,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
 
 import static dk.statsbiblioteket.medieplatform.autonomous.ConfigConstants.AT_NINESTARS;
@@ -80,13 +81,16 @@ public class Main {
         }
     }
 
-    private static void runComponent(Batch batch, ArrayList<ResultCollector> resultList,
-                                     RunnableComponent component1) throws WorkException {
+    private static ResultCollector runComponent(Batch batch,
+                                     RunnableComponent component1)  {
         //log.info("Preparing to run component {}", component1.getComponentName());
         ResultCollector result1 = new ResultCollector(component1.getComponentName(), component1.getComponentVersion());
-        resultList.add(result1);
-        doWork(batch, component1, result1);
-        //log.info("Completed run of component {}", component1.getComponentName());
+        try {
+            doWork(batch, component1, result1);
+        } catch (WorkException e) {
+            // handled already.
+        }
+        return result1;
     }
 
     /**
@@ -170,22 +174,15 @@ public class Main {
     }
 
     protected ResultCollector processBatch(Batch batch, Properties properties) {
-        ArrayList<ResultCollector> resultList = new ArrayList<>();
-        try {
-            RunnableComponent batchStructureCheckerComponent = new BatchStructureCheckerComponent(properties);
-            runComponent(batch, resultList, batchStructureCheckerComponent);
-            //Add more components as needed
-        } catch (WorkException e) {
-            // Ignore, already handled
-        }
+        ResultCollector result = new ResultCollector("batch", getClass().getPackage().getImplementationVersion());
 
-        //
+        Arrays.<RunnableComponent<Batch>>asList(
+                new LogNowComponent("Start"),
+                new BatchStructureCheckerComponent(properties),
+                new LogNowComponent("Stop")
+        ).stream().map(component -> runComponent(batch, component)).reduce(result, (a, next) -> next.mergeInto(a));
 
-        ResultCollector finalresult = new ResultCollector("batch", getClass().getPackage().getImplementationVersion());
-        for (ResultCollector resultCollector : resultList) {
-            finalresult = resultCollector.mergeInto(finalresult);
-        }
-        return finalresult;
+        return result;
     }
 }
 
