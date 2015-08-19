@@ -159,6 +159,17 @@ public class Main {
             return 2;
         }
 
+        ResultCollector finalresult = processBatch(batch, properties);
+        System.out.println(finalresult.toReport());
+
+        if (!finalresult.isSuccess()) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+
+    protected ResultCollector processBatch(Batch batch, Properties properties) {
         ArrayList<ResultCollector> resultList = new ArrayList<>();
         try {
             RunnableComponent batchStructureCheckerComponent = new BatchStructureCheckerComponent(properties);
@@ -174,14 +185,7 @@ public class Main {
         for (ResultCollector resultCollector : resultList) {
             finalresult = resultCollector.mergeInto(finalresult);
         }
-        String result = finalresult.toReport();
-        System.out.println(result);
-
-        if (!finalresult.isSuccess()) {
-            return 1;
-        } else {
-            return 0;
-        }
+        return finalresult;
     }
 }
 

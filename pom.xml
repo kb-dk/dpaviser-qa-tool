@@ -50,6 +50,11 @@
             <version>master-SNAPSHOT</version>
         </dependency>
         <dependency>
+            <groupId>dk.statsbiblioteket.newspaper</groupId>
+            <artifactId>dpaviser-metadata-checker-component</artifactId>
+            <version>master-SNAPSHOT</version>
+        </dependency>
+        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
             <version>${slf4j.version}</version>
