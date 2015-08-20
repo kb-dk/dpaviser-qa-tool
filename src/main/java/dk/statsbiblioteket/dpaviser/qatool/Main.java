@@ -1,11 +1,11 @@
 package dk.statsbiblioteket.dpaviser.qatool;
 
-import dk.statsbiblioteket.dpaviser.BatchStructureCheckerComponent;
 import dk.statsbiblioteket.dpaviser.metadatachecker.BatchMetadataCheckerComponent;
 import dk.statsbiblioteket.medieplatform.autonomous.Batch;
 import dk.statsbiblioteket.medieplatform.autonomous.ConfigConstants;
 import dk.statsbiblioteket.medieplatform.autonomous.ResultCollector;
 import dk.statsbiblioteket.medieplatform.autonomous.RunnableComponent;
+import dk.statsbiblioteket.newspaper.metadatachecker.caches.DocumentCache;
 import dk.statsbiblioteket.util.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -132,7 +132,7 @@ public class Main {
             return 2;
         }
 
-        ResultCollector finalresult = processBatch(batch, properties);
+        ResultCollector finalresult = processBatch(batch, properties, new DocumentCache());
         System.out.println(finalresult.toReport());
 
         if (!finalresult.isSuccess()) {
@@ -142,13 +142,13 @@ public class Main {
         }
     }
 
-    protected ResultCollector processBatch(Batch batch, Properties properties) {
+    protected ResultCollector processBatch(Batch batch, Properties properties, DocumentCache documentCache) {
         ResultCollector result = new ResultCollector("batch", getClass().getPackage().getImplementationVersion());
 
         Arrays.<RunnableComponent<Batch>>asList(
                 new LogNowComponent("Start"),
-                new BatchStructureCheckerComponent(properties),
-                new BatchMetadataCheckerComponent(properties),
+                //new BatchStructureCheckerComponent(properties),
+                new BatchMetadataCheckerComponent(properties, documentCache),
                 new LogNowComponent("Stop")
         ).stream().map(component -> runComponent(batch, component)).reduce(result, (a, next) -> next.mergeInto(a));
 
