@@ -48,8 +48,12 @@ public class Main {
         setIfNotSet(properties, AUTONOMOUS_BATCH_STRUCTURE_STORAGE_DIR, createTempDir().getAbsolutePath());
         setIfNotSet(properties, THREADS_PER_BATCH, Runtime.getRuntime().availableProcessors() + "");
 
-        setIfNotSet(properties, ConfigConstants.ITERATOR_FILESYSTEM_GROUPINGCHAR, ".");
+        /*
+        PDF files are datafiles going into BitMagasinet.  Non-datafiles go in DOMS.
+         */
+
         setIfNotSet(properties, ConfigConstants.ITERATOR_DATAFILEPATTERN, ".*\\.pdf$");
+        setIfNotSet(properties, ConfigConstants.ITERATOR_FILESYSTEM_GROUPINGCHAR, ".");
         setIfNotSet(properties, ConfigConstants.ITERATOR_FILESYSTEM_CHECKSUMPOSTFIX, ".md5");
         setIfNotSet(properties, ConfigConstants.ITERATOR_FILESYSTEM_IGNOREDFILES, "");
         return properties;
