@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<configuration scan="true">
+<configuration scan="true" debug="true">
     <property name="LOGFILE" value="${basedir}/logs/dpaviser-qa-tool.log"/>
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <prudent>true</prudent>

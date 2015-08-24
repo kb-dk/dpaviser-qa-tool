@@ -1,5 +1,6 @@
 package dk.statsbiblioteket.dpaviser.qatool;
 
+import dk.statsbiblioteket.dpaviser.BatchStructureCheckerComponent;
 import dk.statsbiblioteket.dpaviser.metadatachecker.MetadataCheckerComponent;
 import dk.statsbiblioteket.medieplatform.autonomous.Batch;
 import dk.statsbiblioteket.medieplatform.autonomous.ConfigConstants;
@@ -20,7 +21,7 @@ import static dk.statsbiblioteket.medieplatform.autonomous.ConfigConstants.ITERA
 import static dk.statsbiblioteket.medieplatform.autonomous.ConfigConstants.THREADS_PER_BATCH;
 
 public class Main {
-    private Logger log = LoggerFactory.getLogger(getClass());
+    private Logger log; // initialized in doMain(...)
 
     public static void main(String[] args) {
         try {
@@ -121,14 +122,31 @@ public class Main {
             usage();
             return 2;
         }
+
+        if (System.getProperty("basedir") == null) {
+            // Emulate what the appassembler script sets up.
+            String path = getClass().getProtectionDomain().getCodeSource().getLocation().getPath(); // target/classes
+            File mavenModuleDir = new File(path, "../..");
+
+            File basedir = new File(mavenModuleDir, "target/appassembler");
+            System.setProperty("basedir", basedir.getAbsolutePath());
+
+            // ... and tell logback where to find its configuration file.
+            File logbackXML = new File(mavenModuleDir, "src/main/config/logback.xml");
+            System.setProperty("logback.configurationFile", logbackXML.getAbsolutePath());
+        }
+
+        // And NOW trigger logback initialization
+        log = LoggerFactory.getLogger(getClass());
         log.info("Entered " + getClass());
+
+        String batchId = args[0];
+
         Properties properties;
         Batch batch;
         try {
-            //Get the batch (id) from the command line
-            batch = getBatch(args[0]);
-            //Create the properties that need to be passed into the components
-            properties = createProperties(args[0]);
+            batch = getBatch(batchId);
+            properties = createProperties(batchId);
         } catch (Exception e) {
             usage();
             e.printStackTrace(System.err);
@@ -150,7 +168,7 @@ public class Main {
 
         Arrays.<RunnableComponent<Batch>>asList(
                 new LogNowComponent("Start"),
-                //new BatchStructureCheckerComponent(properties),
+                new BatchStructureCheckerComponent(properties),
                 new MetadataCheckerComponent(properties),
                 new LogNowComponent("Stop")
         ).stream().map(component -> runComponent(batch, component)).reduce(result, (a, next) -> next.mergeInto(a));
