@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>dpaviser-qa-tool</artifactId>
-    <version>master-SNAPSHOT</version>
+    <version>1.0-SNAPSHOT</version>
 
     <scm>
         <url>https://github.com/statsbiblioteket/dpaviser-qa-tool</url>
@@ -47,13 +47,13 @@
         <dependency>
             <groupId>dk.statsbiblioteket.newspaper</groupId>
             <artifactId>dpaviser-structure-checker-component</artifactId>
-            <version>master-SNAPSHOT</version>
+            <version>1.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>dk.statsbiblioteket.newspaper</groupId>
             <artifactId>dpaviser-metadata-checker-component</artifactId>
-            <version>master-SNAPSHOT</version>
+            <version>1.0-SNAPSHOT</version>
         </dependency>
         <!--
         <dependency>
