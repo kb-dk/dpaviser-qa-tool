@@ -1,6 +1,5 @@
 package dk.statsbiblioteket.dpaviser.qatool;
 
-import dk.statsbiblioteket.dpaviser.BatchStructureCheckerComponent;
 import dk.statsbiblioteket.dpaviser.metadatachecker.MetadataCheckerComponent;
 import dk.statsbiblioteket.medieplatform.autonomous.Batch;
 import dk.statsbiblioteket.medieplatform.autonomous.ConfigConstants;
@@ -123,9 +122,10 @@ public class Main {
             return 2;
         }
 
+        // Launched outside appassembler script in IDE?  Emulate behavior before starting logback!
         if (System.getProperty("basedir") == null) {
-            // Emulate what the appassembler script sets up.
-            String path = getClass().getProtectionDomain().getCodeSource().getLocation().getPath(); // target/classes
+            // Find target/classes for the Maven module for _this_ class.
+            String path = getClass().getProtectionDomain().getCodeSource().getLocation().getPath();
             File mavenModuleDir = new File(path, "../..");
 
             File basedir = new File(mavenModuleDir, "target/appassembler");
@@ -168,7 +168,7 @@ public class Main {
 
         Arrays.<RunnableComponent<Batch>>asList(
                 new LogNowComponent("Start"),
-                new BatchStructureCheckerComponent(properties),
+                //new BatchStructureCheckerComponent(properties),
                 new MetadataCheckerComponent(properties),
                 new LogNowComponent("Stop")
         ).stream().map(component -> runComponent(batch, component)).reduce(result, (a, next) -> next.mergeInto(a));
