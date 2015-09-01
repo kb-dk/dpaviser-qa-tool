@@ -59,7 +59,7 @@ public class Main {
     }
 
     private static File createTempDir() throws IOException {
-        File temp = File.createTempFile("ninestarsQA", "");
+        File temp = File.createTempFile("dpaviser-qa-tool", "");
         temp.delete();
         temp.mkdir();
         temp.deleteOnExit();
