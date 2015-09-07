@@ -1,5 +1,6 @@
 package dk.statsbiblioteket.dpaviser.qatool;
 
+import dk.statsbiblioteket.dpaviser.BatchStructureCheckerComponent;
 import dk.statsbiblioteket.dpaviser.metadatachecker.MetadataCheckerComponent;
 import dk.statsbiblioteket.medieplatform.autonomous.Batch;
 import dk.statsbiblioteket.medieplatform.autonomous.ConfigConstants;
@@ -168,7 +169,7 @@ public class Main {
 
         Arrays.<RunnableComponent<Batch>>asList(
                 new LogNowComponent("Start"),
-                //new BatchStructureCheckerComponent(properties),
+                new BatchStructureCheckerComponent(properties),
                 new MetadataCheckerComponent(properties),
                 new LogNowComponent("Stop")
         ).stream().map(component -> runComponent(batch, component)).reduce(result, (a, next) -> next.mergeInto(a));
